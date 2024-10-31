@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/al/Code/Uni/TEP/Zad2_3/Zadanie2_3'
+relocations:     []
+...
