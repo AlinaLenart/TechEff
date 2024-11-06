@@ -1,5 +1,6 @@
 #include "CNumber.h"
 #include "Constants.h"
+#include <algorithm>
 #include <iostream>
 #include <cstdlib>
 
@@ -16,12 +17,10 @@ CNumber::CNumber(int iValue) {
 CNumber::CNumber(const CNumber &pcOther) {
     i_length = pcOther.getILength();
     pi_table = new int[i_length];
-    for (int i = 0; i < i_length; i++) {
-        pi_table[i] = pcOther.pi_table[i];
-    }
+    std::copy(pcOther.pi_table, pcOther.pi_table + i_length, pi_table);
     is_negative = pcOther.getIsNegative();
 }
-
+ 
 CNumber::~CNumber() {
     delete[] pi_table;
 }
@@ -51,6 +50,10 @@ CNumber CNumber::operator=(const int iValue) {
         i_length++;
     }
 
+    if (iValue == 0) {
+        i_length = 1;
+    }
+
     pi_table = new int[i_length];
 
     for (int i = i_length - 1; i >= 0; i--) {
@@ -72,7 +75,7 @@ a drugi obiekt bedzie odwolywal sie do nieistniejacej juz tablicy to mozee to pr
 
 CNumber CNumber::operator=(const CNumber &number) {
     if (this == &number) {
-        std::cout<<"proba samoprzypisania"<<std::endl;// sprawdzenie samoprzypisania
+        std::cout<<"Proba samoprzypisania"<<std::endl;// sprawdzenie samoprzypisania
         return *this;
     }
 
@@ -82,10 +85,22 @@ CNumber CNumber::operator=(const CNumber &number) {
     is_negative = number.getIsNegative();
 
     pi_table = new int[i_length];
-    for (int i = 0; i < i_length; i++) {
-        pi_table[i] = number.getPITable()[i]; //manualnie
-    }
+    std::copy(number.getPITable(), number.getPITable() + i_length, pi_table);
     return *this;
+}
+
+CNumber CNumber::operator^(const int valueToDelete) {
+    if (valueToDelete > 9) {
+        return *this;
+    }
+    int i = 0;
+    CNumber newNumber(*this);
+    while (newNumber.pi_table[i] == valueToDelete) {
+        newNumber.pi_table[i] = 0;
+        i++;
+    }
+    removeLeadingZeros(newNumber.pi_table, newNumber.i_length);
+    return newNumber;
 }
 
 CNumber CNumber::operator+(int iValue) const {

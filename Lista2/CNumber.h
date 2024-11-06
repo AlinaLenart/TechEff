@@ -16,6 +16,7 @@ public:
     
     CNumber operator=(int iValue);
     CNumber operator=(const CNumber &number);
+    CNumber operator^(const int valueToDelete); //modyfikacja
     CNumber operator+(int iValue) const;
     CNumber operator+(const CNumber &number) const;
     CNumber operator-(int iValue) const;
@@ -49,6 +50,7 @@ private:
 
     bool isBiggerThan (const CNumber &number) const;
     bool isEqual(const CNumber &number) const;
+
 };
 
 

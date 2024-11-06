@@ -1,5 +1,5 @@
 ---
 triple:          'arm64-apple-darwin'
-binary-path:     '/Users/al/Code/tepplpp/main'
+binary-path:     '/Users/al/Code/Uni/TechEff/Lista2/main'
 relocations:     []
 ...
