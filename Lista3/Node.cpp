@@ -14,6 +14,11 @@ Node::Node(int val)
     : type(NodeType::CONSTANT), constantValue(val), childrenAmount(0) {
     value = std::to_string(val);
 }
+//konstruktor kopiujacy
+Node::Node(const Node& other)
+    : type(other.type), value(other.value), children() {
+    // dzieci kopiuje w drzewie
+}
 
 void Node::addChild(Node* child) {
     children.push_back(child);
@@ -23,3 +28,8 @@ Node::~Node() {
         delete children[i];
     }
 }
+
+bool Node::isLeaf() const{
+    return children.empty();
+}
+

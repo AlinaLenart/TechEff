@@ -6,10 +6,28 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 Tree::Tree() : root(nullptr), invalidInput(false) {}
 Tree::~Tree() { delete root; }
 
+Tree::Tree(const Tree& other)
+    : root(nullptr), invalidInput(other.invalidInput), variables(other.variables) {
+    if (other.root) {
+        root = new Node(*other.root);  //kopia node roota
+        copyChildren(root, other.root);  // Recursively copy all children
+    }
+}
+
+void Tree::copyChildren(Node* dest, Node* src) {
+    if (!src || !dest) return;
+
+    for (Node* child : src->children) {
+        Node* newChild = new Node(*child);  // kopia dzieci
+        dest->addChild(newChild);
+        copyChildren(newChild, child);  // po kolei rekursja kopiuje dzieci wglab 
+    }
+}
 
 void Tree::buildTree(const vector<string>& tokens) {
     int index = 0;
@@ -42,7 +60,10 @@ Node* Tree::buildTreeHelper(const vector<string>& tokens, int& index) { //todo z
     }
     //token to zmienna a, b, c
     else if (isalpha(token[0])) {
-        variables.insert(token);
+        if (variables.find(token) == variables.end()) { //jesli nie znajdzie
+            variables[token] = DEFAULT_FILL_VALUE; //difultowo daje 1
+        }
+        //uklada alfabetycznie bo to mapa
         return new Node(VARIABLE, token);
     }
     //token to stala liczbowa 5, 3, 7265
@@ -107,70 +128,192 @@ string Tree::getInOrder() const {
 }
 
 void Tree::vars() const {
-    for (set<string>::const_iterator it = variables.begin(); it != variables.end(); ++it) {
-        cout << *it << " ";
+    for (map<string, int>::const_iterator it = variables.begin(); it != variables.end(); ++it) {
+        cout << it->first << " "; // klucz czyli nazwa zmiennej
     }
     cout << endl;
 }
 
 
+double Tree::compHelper(Node* node) {
+    if (!node) return 0;
 
-/*
-string Tree::replaceVariablesWithValues(const string& expression, const vector<double>& varValues) const {
-    string result = expression;
+    if (node->type == CONSTANT) {
+        //before: return atoi(node->value.c_str());
+        char* end;
+        long value = strtol(node->value.c_str(), &end, BASE);  // base 10 for decimal numbers
 
-    // For each variable in the list, replace its occurrence in the expression with the corresponding value.
-    for (set<string>::const_iterator it = variables.begin(); it != variables.end(); ++it) {
-        string var = *it; // Get variable name from the iterator
-        string value = to_string(varValues[var]); // Get corresponding value as a string (assuming varValues is a map or similar structure)
+        if (*end != '\0') { // sprawdzenie czy konwersja powiodla sie
+            std::cerr << "ERROR: Invalid constant value '" << node->value << "' in expression." << std::endl;
+            invalidInput = true;
+            return 0;
+        }
 
-        // Replace all occurrences of the variable with its value
-        size_t pos = 0;
-        while ((pos = result.find(var, pos)) != string::npos) {
-            result.replace(pos, var.length(), value);
-            pos += value.length();
+        return static_cast<int>(value);
+    }
+    if (node->type == VARIABLE) {
+        return variables[node->value];
+    }
+    if (node->type == OPERATOR) {
+        if (node->value == "+") {
+            return compHelper(node->children[0]) + compHelper(node->children[1]);
+        } else if (node->value == "-") {
+            return compHelper(node->children[0]) - compHelper(node->children[1]);
+        } else if (node->value == "*") {
+            return compHelper(node->children[0]) * compHelper(node->children[1]);
+        } else if (node->value == "/") {
+            int divisor = compHelper(node->children[1]);
+            return divisor != 0 ? compHelper(node->children[0]) / divisor : 0;
+        } else if (node->value == SINUS_SYMBOL) {
+            return sin(compHelper(node->children[0]));
+        } else if (node->value == COSINUS_SYMBOL) {
+            return cos(compHelper(node->children[0]));
+        }
+    }
+    return 0;
+}
+
+void Tree::comp(const std::vector<int>& values) {
+    if (values.size() != variables.size()) {
+        std::cout << "ERROR: Number of values provided: "<<values.size()<<" does not match the number of variables: "<<variables.size()<< std::endl;
+        return;
+    }
+
+    int i = 0;
+    for (std::map<std::string, int>::iterator it = variables.begin(); it != variables.end(); ++it) {
+        it->second = values[i++];
+    }
+
+    int result = compHelper(root);
+    std::cout << "Result: " << result << std::endl;
+}
+
+Tree Tree::operator+(Tree &other) const {
+    Tree copy1 = *this;
+    Node* leafNode = findLeaf(copy1.root);
+
+    if (leafNode && other.root) {
+        Node* parentNode = findParent(copy1.root, leafNode);
+
+        if (parentNode) {
+            Node* newNode = new Node(*other.root);
+            for (Node* child : other.root->children) {
+                newNode->addChild(new Node(*child)); // kopia kazdego dziecka
+            }
+
+            size_t replacementIndex = parentNode->children.size();
+
+            for (size_t i = 0; i < parentNode->children.size(); ++i) {
+                if (parentNode->children[i] == leafNode) {
+                    replacementIndex = i;
+                }
+            }
+
+            if (replacementIndex < parentNode->children.size()) {
+                parentNode->children[replacementIndex] = newNode;
+            }
+
+            delete leafNode; //delokacja
         }
     }
 
-    return result;
+    return copy1;
 }
 
-void Tree::comp(const vector<double>& varValues) {
-    // Check if the number of provided values matches the number of variables
+Node* Tree::findParent(Node* root, Node* child) const{
+    if (root == nullptr) return nullptr;
+
+    for (Node* node : root->children) {
+        if (node == child) {
+            return root;
+        }
+        Node* foundParent = findParent(node, child);
+        if (foundParent) return foundParent;
+    }
+
+    return nullptr;
+}
+
+
+Node* Tree::findLeaf(Node* node) const {
+    if (!node) return nullptr;
+
+    if (node->isLeaf()) {
+        return node;
+    }
+
+    for (Node* child : node->children) {
+        Node* leaf = findLeaf(child);
+        if (leaf) {
+            return leaf;
+        }//is not nullptr
+    }
+
+    return nullptr;
+}
+
+Tree& Tree::operator=(const Tree& rhs) { //todo
+    if (this == &rhs) {
+        return *this;
+    }
+
+    delete root;
+    root = nullptr;
+
+
+    return *this;
+}
+
+
+
+
+
+
+
+
+/*
+
+void Tree::comp(const vector<int>& varValues) {
     if (varValues.size() != variables.size()) {
         std::cout << "ERROR: The number of values does not match the number of variables." << std::endl;
         return;
     }
 
-    // Get the inorder expression
     string inorderExpr = getInOrder();
-
-    // Replace variables in the expression with their corresponding values
-    string exprWithValues = replaceVariablesWithValues(inorderExpr, varValues);
-
-    // Now, we need to evaluate the expression with replaced variables.
-    // We'll use a simple expression evaluator here to handle basic math operations.
-    double result = evaluateMathExpression(exprWithValues); // You can implement this evaluator
-
+    cout<<inorderExpr<<endl;
+    completeVariablesWithValues(varValues);
+    double result = evaluateMathExpression(inorderExpr);
     std::cout << "Result: " << result << std::endl;
 }
 
-double Tree::evaluateMathExpression(const string& expression) const {
-    // A very basic evaluator for simple math expressions. You can improve this by using a proper expression parser.
-    // For now, we'll use a simple eval function.
+void Tree::completeVariablesWithValues(const vector<int>& varValues) {
+    map<string, int>::iterator it = variables.begin();
+    int i = 0;
 
+    // Update each variable in the map with corresponding value from varValues
+    while (it != variables.end() && i < varValues.size()) {
+        it->second = varValues[i];  // Set the map's value to the value in varValues
+        ++it;
+        ++i;
+    }
+}
+
+
+double Tree::evaluateMathExpression(const string& expression) const {
     std::istringstream exprStream(expression);
+
     double result = 0;
     double temp;
     char op = '+';
 
     while (exprStream >> temp) {
+
         if (op == '+') result += temp;
         else if (op == '-') result -= temp;
         else if (op == '*') result *= temp;
         else if (op == '/') result /= temp;
 
-        exprStream >> op;  // Get the next operator
+        exprStream >> op;  // Get next operator
     }
 
     return result;
