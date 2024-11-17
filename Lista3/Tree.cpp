@@ -19,13 +19,16 @@ Tree::Tree(const Tree& other)
     }
 }
 
+Node* Tree::getRoot() const { return root; }
+map<string, int> Tree::getVariables() const { return variables; }
+
 void Tree::copyChildren(Node* dest, Node* src) {
     if (!src || !dest) return;
 
     for (Node* child : src->children) {
         Node* newChild = new Node(*child);  // kopia dzieci
         dest->addChild(newChild);
-        copyChildren(newChild, child);  // po kolei rekursja kopiuje dzieci wglab 
+        copyChildren(newChild, child);  // po kolei rekursja kopiuje dzieci wglab
     }
 }
 
@@ -33,7 +36,7 @@ void Tree::buildTree(const vector<string>& tokens) {
     int index = 0;
     root = buildTreeHelper(tokens, index);
     if (root == nullptr || invalidInput) {
-        std::cout << "Invalid input expression." << std::endl;
+        cout << "Invalid input expression." << std::endl;
     }
 }
 
@@ -50,7 +53,7 @@ Node* Tree::buildTreeHelper(const vector<string>& tokens, int& index) { //todo z
         for (int i = 0; i < numChildren; ++i) {
             // jesli napotkamy operator z brakiem operandów (np. "+ +")
             if (index >= tokens.size()) {
-                std::cout << "Warning: Missing operand, using default value '1'.\n";
+                cout << "Missing operand, using default value\n";
                 node->addChild(new Node(DEFAULT_FILL_VALUE));
             } else {
                 node->addChild(buildTreeHelper(tokens, index));
@@ -188,37 +191,53 @@ void Tree::comp(const std::vector<int>& values) {
     std::cout << "Result: " << result << std::endl;
 }
 
-Tree Tree::operator+(Tree &other) const {
-    Tree copy1 = *this;
-    Node* leafNode = findLeaf(copy1.root);
+Tree Tree::operator+(Tree& other) const {
+    // Jeśli jedno z drzew jest puste, zwracamy drugie (kopia)
+    if (!this->root) return other;
+    if (!other.root) return *this;
 
-    if (leafNode && other.root) {
-        Node* parentNode = findParent(copy1.root, leafNode);
+    Tree result = *this; // Kopia bieżącego drzewa
+    Node* targetLeaf = findLeaf(result.root); // Znajdź liść do zamiany
 
+    if (targetLeaf) {
+        Node* parentNode = findParent(result.root, targetLeaf); // Znajdź rodzica liścia
         if (parentNode) {
-            Node* newNode = new Node(*other.root);
-            for (Node* child : other.root->children) {
-                newNode->addChild(new Node(*child)); // kopia kazdego dziecka
-            }
+            // Stwórz kopię `other.root` i jego dzieci
+            Node* newSubtree = copySubtree(other.root);
 
-            size_t replacementIndex = parentNode->children.size();
+            // Zamień liść na nowe poddrzewo
+            replaceChild(parentNode, targetLeaf, newSubtree);
 
-            for (size_t i = 0; i < parentNode->children.size(); ++i) {
-                if (parentNode->children[i] == leafNode) {
-                    replacementIndex = i;
-                }
-            }
-
-            if (replacementIndex < parentNode->children.size()) {
-                parentNode->children[replacementIndex] = newNode;
-            }
-
-            delete leafNode; //delokacja
+            // Usuń stary liść
+            delete targetLeaf;
         }
     }
 
-    return copy1;
+    return result;
 }
+
+// Kopiuje całe poddrzewo
+Node* Tree::copySubtree(Node* node) const {
+    if (!node) return nullptr;
+    Node* copy = new Node(*node); // Kopia węzła
+    for (Node* child : node->children) {
+        copy->addChild(copySubtree(child)); // Rekurencyjnie kopiuj dzieci
+    }
+    return copy;
+}
+
+// Zamienia dziecko `oldChild` na `newChild` w `parentNode`
+void Tree::replaceChild(Node* parentNode, Node* oldChild, Node* newChild) const {
+    if (!parentNode || !oldChild || !newChild) return;
+
+    for (size_t i = 0; i < parentNode->children.size(); ++i) {
+        if (parentNode->children[i] == oldChild) {
+            parentNode->children[i] = newChild;
+            return;
+        }
+    }
+}
+
 
 Node* Tree::findParent(Node* root, Node* child) const{
     if (root == nullptr) return nullptr;
@@ -252,18 +271,21 @@ Node* Tree::findLeaf(Node* node) const {
     return nullptr;
 }
 
-Tree& Tree::operator=(const Tree& rhs) { //todo
-    if (this == &rhs) {
+Tree& Tree::operator=(const Tree& other) {
+    if (this == &other) {
         return *this;
     }
 
-    delete root;
-    root = nullptr;
-
-
+    Tree temp(other);
+    swap(temp);
     return *this;
 }
 
+void Tree::swap(Tree& other) {
+    std::swap(root, other.root);
+    std::swap(invalidInput, other.invalidInput);
+    std::swap(variables, other.variables);
+}
 
 
 

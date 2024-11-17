@@ -12,6 +12,7 @@ class Tree {
 private:
     Node* root;
     bool invalidInput;
+    map<string, int> variables; //todo make private
 
     void copyChildren(Node* dest, Node* src);
     Node* buildTreeHelper(const vector<string>& tokens, int& index);
@@ -22,19 +23,24 @@ private:
     double compHelper(Node* node);
     Node* findLeaf(Node* node) const;
     Node* findParent(Node* root, Node* child) const;
+    Node* copySubtree(Node* node) const;
+    void replaceChild(Node* parentNode, Node* oldChild, Node* newChild) const;
+    void swap(Tree& other);
 
 
 public:
     Tree();
     ~Tree();
     Tree(const Tree& other);
-    void enter(const string& expression);              //todo
+
+    Node* getRoot() const;
+    map<string, int> getVariables() const;
+
     void printPrefix() const;
     void buildTree(const vector<string>& tokens);
     string getInOrder() const;
     void vars() const;
     void comp(const vector<int>& varValues);
-    map<string, int> variables; //todo make private
     Tree operator+(Tree &other) const;
     Tree& operator=(const Tree& rhs);
 };

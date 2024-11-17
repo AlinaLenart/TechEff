@@ -9,4 +9,6 @@ add_executable(TEP_CLion main.cpp
         Node.h
         Tree.h
         Constants.h
+        ExpressionReader.cpp
+        ExpressionReader.h
 )
