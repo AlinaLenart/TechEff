@@ -67,8 +67,8 @@ build CMakeFiles/TEP_CLion.dir/Node.cpp.o: CXX_COMPILER__TEP_CLion_unscanned_Deb
   OBJECT_DIR = CMakeFiles/TEP_CLion.dir
   OBJECT_FILE_DIR = CMakeFiles/TEP_CLion.dir
 
-build CMakeFiles/TEP_CLion.dir/ExpressionReader.cpp.o: CXX_COMPILER__TEP_CLion_unscanned_Debug /Users/al/Code/Uni/TEP_CLion/ExpressionReader.cpp || cmake_object_order_depends_target_TEP_CLion
-  DEP_FILE = CMakeFiles/TEP_CLion.dir/ExpressionReader.cpp.o.d
+build CMakeFiles/TEP_CLion.dir/ExpressionMenu.cpp.o: CXX_COMPILER__TEP_CLion_unscanned_Debug /Users/al/Code/Uni/TEP_CLion/ExpressionMenu.cpp || cmake_object_order_depends_target_TEP_CLion
+  DEP_FILE = CMakeFiles/TEP_CLion.dir/ExpressionMenu.cpp.o.d
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/TEP_CLion.dir
   OBJECT_FILE_DIR = CMakeFiles/TEP_CLion.dir
@@ -81,7 +81,7 @@ build CMakeFiles/TEP_CLion.dir/ExpressionReader.cpp.o: CXX_COMPILER__TEP_CLion_u
 #############################################
 # Link the executable TEP_CLion
 
-build TEP_CLion: CXX_EXECUTABLE_LINKER__TEP_CLion_Debug CMakeFiles/TEP_CLion.dir/main.cpp.o CMakeFiles/TEP_CLion.dir/Tree.cpp.o CMakeFiles/TEP_CLion.dir/Node.cpp.o CMakeFiles/TEP_CLion.dir/ExpressionReader.cpp.o
+build TEP_CLion: CXX_EXECUTABLE_LINKER__TEP_CLion_Debug CMakeFiles/TEP_CLion.dir/main.cpp.o CMakeFiles/TEP_CLion.dir/Tree.cpp.o CMakeFiles/TEP_CLion.dir/Node.cpp.o CMakeFiles/TEP_CLion.dir/ExpressionMenu.cpp.o
   FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.0.sdk
   LINK_FLAGS = -L/opt/homebrew/opt/llvm/lib
   OBJECT_DIR = CMakeFiles/TEP_CLion.dir

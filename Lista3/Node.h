@@ -9,7 +9,6 @@ using namespace std;
 enum NodeType { OPERATOR, VARIABLE, CONSTANT };
 
 class Node {
-private:
 
 public:
     NodeType type;
