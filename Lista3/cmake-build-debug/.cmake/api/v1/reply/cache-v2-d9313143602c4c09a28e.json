@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/al/Code/Uni/TEP_CLion/cmake-build-debug"
+			"value" : "/Users/al/Code/Uni/TechEff/Lista3/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -479,7 +479,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/al/Code/Uni/TEP_CLion/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "/Users/al/Code/Uni/TechEff/Lista3/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -539,7 +539,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/Users/al/Code/Uni/TEP_CLion"
+			"value" : "/Users/al/Code/Uni/TechEff/Lista3"
 		},
 		{
 			"name" : "CMAKE_INSTALL_NAME_TOOL",
@@ -1127,7 +1127,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/al/Code/Uni/TEP_CLion/cmake-build-debug"
+			"value" : "/Users/al/Code/Uni/TechEff/Lista3/cmake-build-debug"
 		},
 		{
 			"name" : "TEP_CLion_IS_TOP_LEVEL",
@@ -1151,7 +1151,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "/Users/al/Code/Uni/TEP_CLion"
+			"value" : "/Users/al/Code/Uni/TechEff/Lista3"
 		}
 	],
 	"kind" : "cache",

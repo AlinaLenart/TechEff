@@ -11,4 +11,8 @@ add_executable(TEP_CLion main.cpp
         Constants.h
         ExpressionMenu.cpp
         ExpressionMenu.h
+        Result.cpp
+        Error.cpp
+        Error.h
+        Result.h
 )

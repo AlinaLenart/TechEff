@@ -322,5 +322,3 @@ string Tree::intToString(int value) {
 
 Node* Tree::getRoot() const { return root; }
 map<string, int> Tree::getVariables() const { return variables; }
-
-
