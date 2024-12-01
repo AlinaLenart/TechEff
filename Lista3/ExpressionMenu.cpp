@@ -62,9 +62,14 @@ void ExpressionMenu::startMenu() {
 void ExpressionMenu::enterExpression(string expression) {
     vector<string> tokens = tokenizeExpression(expression);
 
-    cout << "Expression entered: " << expression << endl;
-
-    expressionTree.buildTree(tokens);
+    Result<Node*, Error> result = expressionTree.buildTree(tokens);
+    if (result.bIsSuccess()) {
+        cout << "SUCCESS: " << expression << endl;
+        //expressionTree = result.cGetValue();
+    }
+    else {
+        cout << "FAILURE: \n" << result.sGetErrors() << endl;
+    }
 }
 
 void ExpressionMenu::printPrefixExpression() const {

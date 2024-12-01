@@ -10,6 +10,9 @@ class Error {
 public:
     Error();
     Error(const string &s);
+
+    explicit Error(const char * str);
+
     ~Error();
     string getDescription();
 private:

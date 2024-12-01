@@ -5,6 +5,8 @@
 #include "Node.h"
 #include <string>
 
+#include "Result.h"
+
 using namespace std;
 
 class Tree {
@@ -17,7 +19,7 @@ public:
     map<string, int> getVariables() const;
 
     string printPrefix() const;
-    void buildTree(const vector<string>& tokens);
+    Result<Node*, Error > buildTree(const vector<string>& tokens);
     string getInOrder() const;
     void vars() const;
     void comp(const vector<int>& varValues);
@@ -31,7 +33,7 @@ private:
     map<string, int> variables;
 
     void copyChildren(Node* dest, Node* src);
-    Node* buildTreeHelper(const vector<string>& tokens, int& index);
+    Result<Node*, Error> buildTreeHelper(const vector<string>& tokens, int& index);
     string printPrefixHelper(Node* node) const;
     string inorderTraversal(Node* node) const;
     double compHelper(Node* node);
@@ -42,7 +44,7 @@ private:
     void swap(Tree& other);
     string intToString(int value);
     void countGreatherThanHelper(int &count, int number, Node *node) const;
-
+    string getExtraTokensDescription(const vector<string>& tokens, int startIndex);
 };
 
 #endif

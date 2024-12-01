@@ -11,7 +11,7 @@ Node::Node(const NodeType t, const string& val) :
 
 // konstruktor dla stalej
 Node::Node(int val)
-    : type(NodeType::CONSTANT), constantValue(val), childrenAmount(0) {
+    : type(CONSTANT), constantValue(val), childrenAmount(0) {
     value = std::to_string(val);
 }
 //konstruktor kopiujacy
