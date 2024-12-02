@@ -41,6 +41,7 @@ Result<Tree*, Error> Tree::buildTree(const vector<string>& tokens) {
         Node* rootNode = result.cGetValue();
         Tree* tree = new Tree();
         tree->root = rootNode;
+        tree->variables = variables;
         return Result<Tree*, Error>::cOk(tree);
     } else {
         vector<Error*> errors = result.vGetErrors();
