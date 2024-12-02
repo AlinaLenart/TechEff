@@ -12,6 +12,7 @@ using namespace std;
 class Tree {
 public:
     Tree();
+    Tree(Node* rootNode);
     ~Tree();
     Tree(const Tree& other);
 
@@ -19,7 +20,7 @@ public:
     map<string, int> getVariables() const;
 
     string printPrefix() const;
-    Result<Node*, Error > buildTree(const vector<string>& tokens);
+    Result<Tree*, Error > buildTree(const vector<string>& tokens);
     string getInOrder() const;
     void vars() const;
     void comp(const vector<int>& varValues);
@@ -30,10 +31,10 @@ public:
 
 private:
     Node* root;
-    map<string, int> variables;
+    map<string, int> variables; //
 
     void copyChildren(Node* dest, Node* src);
-    Result<Node*, Error> buildTreeHelper(const vector<string>& tokens, int& index);
+    Result<Node*, Error > buildTreeHelper(const vector<string>& tokens, int& index);
     string printPrefixHelper(Node* node) const;
     string inorderTraversal(Node* node) const;
     double compHelper(Node* node);

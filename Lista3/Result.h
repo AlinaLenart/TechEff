@@ -2,10 +2,9 @@
 #ifndef RESULT_H
 #define RESULT_H
 
+#include <iostream>
 #include <vector>
 #include <sstream>
-
-
 #include "Error.h"
 
 using namespace std;
@@ -38,8 +37,8 @@ private:
     T* pc_value;
     vector<E*> v_errors;
     void copyFrom(const Result<T, E>& other);
-    void cleanup();
     void push_back(E *error);
+    void cleanup();
 
 };
 
@@ -49,8 +48,11 @@ Result<T, E>::Result(const T& cValue)
     : pc_value(new T(cValue)), v_errors(NULL) {}
 
 template <typename T, typename E>
-Result<T, E>::Result(E* pcError) : pc_value(NULL), v_errors() {
-    v_errors.push_back((pcError == NULL) ? NULL : pcError);
+Result<T, E>::Result(E* pcError)
+    : pc_value(NULL), v_errors() {
+    if (pcError != NULL) {
+        v_errors.push_back(pcError);
+    }
 }
 
 template <typename T, typename E>
@@ -124,15 +126,6 @@ void Result<T, E>::copyFrom(const Result<T, E>& cOther) {
     }
 }
 
-template <typename T, typename E>
-void Result<T, E>::cleanup() {
-    delete pc_value;
-    pc_value = NULL;
-    for (size_t i = 0; i < v_errors.size(); ++i) {
-        delete v_errors[i];
-    }
-    v_errors.clear();
-}
 
 template <typename T, typename E>
 void Result<T, E>::push_back(E* pcError) {
@@ -152,6 +145,12 @@ string Result<T, E>::sGetErrors() const {
     return ss.str();
 }
 
+template <typename T, typename E>
+void Result<T, E>::cleanup() {
+    delete[] pc_value;
+    pc_value = NULL;
+    v_errors.clear();
+}
 
 
 

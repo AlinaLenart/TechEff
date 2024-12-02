@@ -11,7 +11,7 @@ Error::Error(const char *str) {
 
 Error::~Error() {}
 
-string Error::getDescription() {
+string Error::getDescription() const {
     return description;
 }
 

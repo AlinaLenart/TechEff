@@ -6,6 +6,8 @@
 #include <map>
 #include <sstream>
 #include "Tree.h"
+#include "Error.h"
+#include "ResultSaver.h"
 
 using namespace std;
 
@@ -62,14 +64,22 @@ void ExpressionMenu::startMenu() {
 void ExpressionMenu::enterExpression(string expression) {
     vector<string> tokens = tokenizeExpression(expression);
 
-    Result<Node*, Error> result = expressionTree.buildTree(tokens);
+    Result<Tree*, Error> result = expressionTree.buildTree(tokens);
     if (result.bIsSuccess()) {
         cout << "SUCCESS: " << expression << endl;
-        //expressionTree = result.cGetValue();
+        expressionTree = *result.cGetValue();
     }
     else {
         cout << "FAILURE: \n" << result.sGetErrors() << endl;
     }
+
+    char saveChoice;
+    cout << "Do you want to save the result to a file? (y/n): ";
+    cin >> saveChoice;
+    if (saveChoice == 'y' || saveChoice == 'Y') {
+        ResultSaver<Tree*, Error>::saveToFile(result); //odpali to z tree*
+    }
+
 }
 
 void ExpressionMenu::printPrefixExpression() const {

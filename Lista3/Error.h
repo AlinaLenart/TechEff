@@ -14,7 +14,7 @@ public:
     explicit Error(const char * str);
 
     ~Error();
-    string getDescription();
+    string getDescription() const;
 private:
     string description;
 };

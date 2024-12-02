@@ -14,4 +14,5 @@ add_executable(TEP_CLion main.cpp
         Error.cpp
         Error.h
         Result.h
+        ResultSaver.h
 )

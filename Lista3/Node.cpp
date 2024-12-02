@@ -1,5 +1,8 @@
 #include "Node.h"
 
+#include <iostream>
+#include <set>
+
 // konstruktor dla operatora
 Node::Node(const NodeType t, const string& val, const int numChildren) :
     type(t), value(val), constantValue(0), childrenAmount(numChildren) {}
@@ -20,6 +23,12 @@ Node::Node(const Node& other)
     //dzieci kopiuje w drzewie
 }
 
+// Node::Node(Node&& other)
+//     : type(other.type), value(std::move(other.value)), constantValue(other.constantValue), childrenAmount(other.childrenAmount), children(std::move(other.children)) {
+//     other.childrenAmount = 0;
+//     other.constantValue = 0;
+// }
+
 void Node::addChild(Node* child) {
     children.push_back(child);
 }
@@ -28,9 +37,12 @@ Node::~Node() {
     for (size_t i = 0; i < children.size(); ++i) {
         delete children[i];
     }
+    children.clear();
 }
 
 bool Node::isLeaf() const{
     return children.empty();
 }
+
+
 

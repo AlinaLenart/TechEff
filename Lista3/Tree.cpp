@@ -14,6 +14,7 @@
 using namespace std;
 
 Tree::Tree() : root(NULL) {}
+Tree::Tree(Node* rootNode) : root(rootNode), variables() {}
 Tree::~Tree() { delete root; }
 
 Tree::Tree(const Tree& other)
@@ -24,29 +25,38 @@ Tree::Tree(const Tree& other)
     }
 }
 
-Result<Node*, Error> Tree::buildTree(const vector<string>& tokens) {
+Result<Tree*, Error> Tree::buildTree(const vector<string>& tokens) {
     int index = 0;
 
     Result<Node*, Error> result = buildTreeHelper(tokens, index);
 
     if (index < tokens.size()) {
         vector<Error*> errors = result.vGetErrors();
-        string extraTokensDescription = getExtraTokensDescription(tokens, index);
-        errors.push_back(new Error("Too many tokens in expression: " + extraTokensDescription));
-        return Result<Node*, Error>::cFail(errors);
+        string description = getExtraTokensDescription(tokens, index);
+        errors.push_back(new Error("Too many tokens in expression: " + description));
+        return Result<Tree*, Error>::cFail(errors);
     }
 
-    return result;
+    if (result.bIsSuccess()) {
+        Node* rootNode = result.cGetValue();
+        Tree* tree = new Tree();
+        tree->root = rootNode;
+        return Result<Tree*, Error>::cOk(tree);
+    } else {
+        vector<Error*> errors = result.vGetErrors();
+        return Result<Tree*, Error>::cFail(errors);
+    }
+
 }
 
 Result<Node*, Error> Tree::buildTreeHelper(const vector<string>& tokens, int& index) {
     if (index >= tokens.size()) {
-        vector<Error*> errors;
+        std::vector<Error*> errors;
         errors.push_back(new Error("Unexpected end of tokens."));
         return Result<Node*, Error>::cFail(errors);
     }
 
-    string token = tokens[index++];
+    std::string token = tokens[index++];
 
     if (token == "+" || token == "-" || token == "*" || token == "/" || token == SINUS_SYMBOL || token == COSINUS_SYMBOL) {
         int numChildren = (token == SINUS_SYMBOL || token == COSINUS_SYMBOL) ? 1 : 2;
@@ -56,9 +66,9 @@ Result<Node*, Error> Tree::buildTreeHelper(const vector<string>& tokens, int& in
 
         for (int i = 0; i < numChildren; ++i) {
             if (index >= tokens.size()) {
-                //todo
                 errors.push_back(new Error("Missing operand for operator: " + token));
-                node->addChild(new Node(DEFAULT_FILL_VALUE));
+                //node->addChild(new Node(DEFAULT_FILL_VALUE));
+                return Result<Node*, Error>::cFail(errors);
             } else {
                 Result<Node*, Error> childResult = buildTreeHelper(tokens, index);
                 if (childResult.bIsSuccess()) {
@@ -66,8 +76,8 @@ Result<Node*, Error> Tree::buildTreeHelper(const vector<string>& tokens, int& in
                 } else {
                     vector<Error*> childErrors = childResult.vGetErrors();
 
-                    for (size_t i = 0; i < childErrors.size(); ++i) {
-                        errors.push_back(childErrors[i]);
+                    for (vector<Error*>::iterator it = childErrors.begin(); it != childErrors.end(); ++it) {
+                        errors.push_back(&**it);
                     }
                 }
             }
@@ -90,11 +100,12 @@ Result<Node*, Error> Tree::buildTreeHelper(const vector<string>& tokens, int& in
         return Result<Node*, Error>::cOk(new Node(atoi(token.c_str())));
     }
     else {
-        vector<Error*> errors;
+        std::vector<Error*> errors;
         errors.push_back(new Error("Invalid token encountered: " + token));
         return Result<Node*, Error>::cFail(errors);
     }
 }
+
 
 string Tree::printPrefix() const {
     return printPrefixHelper(root);
