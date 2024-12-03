@@ -8,13 +8,9 @@
 #include <vector>
 #include <cmath>
 
-#include "Error.h"
-#include "Result.h"
-
 using namespace std;
 
 Tree::Tree() : root(NULL) {}
-Tree::Tree(Node* rootNode) : root(rootNode), variables() {}
 Tree::~Tree() { delete root; }
 
 Tree::Tree(const Tree& other)
@@ -25,88 +21,60 @@ Tree::Tree(const Tree& other)
     }
 }
 
-Result<Tree*, Error> Tree::buildTree(const vector<string>& tokens) {
+void Tree::buildTree(const vector<string>& tokens) {
+
     int index = 0;
-
-    Result<Node*, Error> result = buildTreeHelper(tokens, index);
-
+    root = buildTreeHelper(tokens, index);
     if (index < tokens.size()) {
-        vector<Error*> errors = result.vGetErrors();
-        string description = getExtraTokensDescription(tokens, index);
-        errors.push_back(new Error("Too many tokens in expression: " + description));
-        return Result<Tree*, Error>::cFail(errors);
+        cout << "WARNING: Too many tokens in expression" << endl;
+        cout << "Ignoring: ";
+        for (size_t i = index; i < tokens.size(); ++i) {
+             cout << tokens[i] <<"; ";
+        }
+        cout << endl;
     }
-
-    if (result.bIsSuccess()) {
-        Node* rootNode = result.cGetValue();
-        Tree* tree = new Tree();
-        tree->root = rootNode;
-        tree->variables = variables;
-        return Result<Tree*, Error>::cOk(tree);
-    } else {
-        vector<Error*> errors = result.vGetErrors();
-        return Result<Tree*, Error>::cFail(errors);
-    }
-
 }
 
-Result<Node*, Error> Tree::buildTreeHelper(const vector<string>& tokens, int& index) {
-    if (index >= tokens.size()) {
-        std::vector<Error*> errors;
-        errors.push_back(new Error("Unexpected end of tokens."));
-        return Result<Node*, Error>::cFail(errors);
-    }
+Node* Tree::buildTreeHelper(const vector<string>& tokens, int& index) {
+    if (index >= tokens.size()) return NULL;
 
-    std::string token = tokens[index++];
+    string token = tokens[index++];
 
     if (token == "+" || token == "-" || token == "*" || token == "/" || token == SINUS_SYMBOL || token == COSINUS_SYMBOL) {
-        int numChildren = (token == SINUS_SYMBOL || token == COSINUS_SYMBOL) ? 1 : 2;
 
+        int numChildren = (token == SINUS_SYMBOL || token == COSINUS_SYMBOL) ? 1 : 2; // sin i cos mają 1 dziecko, reszta 2
         Node* node = new Node(OPERATOR, token, numChildren);
-        vector<Error*> errors;
 
         for (int i = 0; i < numChildren; ++i) {
+            // jesli napotkamy operator z brakiem operandów (np. "+ +")
             if (index >= tokens.size()) {
-                errors.push_back(new Error("Missing operand for operator: " + token));
-                //node->addChild(new Node(DEFAULT_FILL_VALUE));
-                return Result<Node*, Error>::cFail(errors);
+                cout << "Missing operand, using default value\n";
+                node->addChild(new Node(DEFAULT_FILL_VALUE));
             } else {
-                Result<Node*, Error> childResult = buildTreeHelper(tokens, index);
-                if (childResult.bIsSuccess()) {
-                    node->addChild(childResult.cGetValue());
-                } else {
-                    vector<Error*> childErrors = childResult.vGetErrors();
-
-                    for (vector<Error*>::iterator it = childErrors.begin(); it != childErrors.end(); ++it) {
-                        errors.push_back(&**it);
-                    }
-                }
+                node->addChild(buildTreeHelper(tokens, index));
             }
         }
-
-        if (errors.empty()) {
-            return Result<Node*, Error>::cOk(node);
-        } else {
-            delete node;
-            return Result<Node*, Error>::cFail(errors);
-        }
+        return node;
     }
+    //token to zmienna a, b, c
     else if (isalpha(token[0])) {
-        if (variables.find(token) == variables.end()) {
+        if (variables.find(token) == variables.end()) { //jesli nie znajdzie
             variables[token] = DEFAULT_FILL_VALUE;
         }
-        return Result<Node*, Error>::cOk(new Node(VARIABLE, token));
+        //uklada alfabetycznie bo to mapaa
+        return new Node(VARIABLE, token);
     }
+    //token to stala liczbowa 5, 3, 7265
     else if (isdigit(token[0])) {
-        return Result<Node*, Error>::cOk(new Node(atoi(token.c_str())));
+        return new Node(atoi(token.c_str())); //ascii na int
     }
+
+    // token jest niepoprawny lub pusta lista
     else {
-        std::vector<Error*> errors;
-        errors.push_back(new Error("Invalid token encountered: " + token));
-        return Result<Node*, Error>::cFail(errors);
+        cout << "ERROR: Invalid token encountered: " << token << endl;
+        return new Node(CONSTANT, intToString(DEFAULT_FILL_VALUE)); //np ujemna
     }
 }
-
 
 string Tree::printPrefix() const {
     return printPrefixHelper(root);
@@ -355,15 +323,4 @@ string Tree::intToString(int value) {
 Node* Tree::getRoot() const { return root; }
 map<string, int> Tree::getVariables() const { return variables; }
 
-string Tree::getExtraTokensDescription(const vector<string>& tokens, int startIndex) {
-    stringstream ss;
-    ss << "[";
-    for (size_t i = startIndex; i < tokens.size(); ++i) {
-        ss << tokens[i];
-        if (i < tokens.size() - 1) {
-            ss << ", ";
-        }
-    }
-    ss << "]";
-    return ss.str();
-}
+
