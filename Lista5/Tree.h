@@ -23,12 +23,15 @@ public:
     Result<Tree*, Error > buildTree(const vector<string>& tokens);
     string getInOrder() const;
     Tree operator+(Tree &other) const;
+    Tree& operator=(const Tree& other);
     Tree& operator=(Tree&& other);
-
+    static int getCopyCount();
+    static void resetCopyCount();
 
 private:
     Node* root;
     map<string, int> variables;
+    static int copyCount;
 
     void copyChildren(Node* dest, Node* src);
     Result<Node*, Error > buildTreeHelper(const vector<string>& tokens, int& index);

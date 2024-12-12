@@ -13,6 +13,8 @@
 
 using namespace std;
 
+int Tree::copyCount = 0;
+
 Tree::Tree() : root(NULL) {}
 Tree::~Tree() { delete root; }
 
@@ -22,6 +24,7 @@ Tree::Tree(const Tree& other)
         root = new Node(*other.root);  //kopia node roota
         copyChildren(root, other.root);
     }
+    ++copyCount;
 }
 
 Result<Tree*, Error> Tree::buildTree(const vector<string>& tokens) {
@@ -46,7 +49,6 @@ Result<Tree*, Error> Tree::buildTree(const vector<string>& tokens) {
         vector<Error*> errors = result.vGetErrors();
         return Result<Tree*, Error>::cFail(errors);
     }
-
 }
 
 Result<Node*, Error> Tree::buildTreeHelper(const vector<string>& tokens, int& index) {
@@ -165,17 +167,16 @@ Tree Tree::operator+(Tree& other) const {
     Tree result = *this;
     Node* targetLeaf = findLeaf(result.root);
 
-    if (targetLeaf) { //todo
+    if (targetLeaf != NULL) {
 
         Node* parentNode = findParent(result.root, targetLeaf);
-        if (parentNode) {
+        if (parentNode != NULL) {
 
             Node* newSubtree = copySubtree(other.root); //kopia podrzewa
             replaceChild(parentNode, targetLeaf, newSubtree);
             delete targetLeaf;
         }
     }
-
     return result;
 }
 
@@ -225,10 +226,24 @@ Node* Tree::findLeaf(Node* node) const {
     return NULL;
 }
 
+Tree& Tree::operator=(const Tree& other) {
+    if (this == &other) {
+        return *this;
+    }
+    copyCount++;
+    Tree temp(other);
+    swap(temp);
+    return *this;
+}
+
+void Tree::swap(Tree& other) {
+    std::swap(root, other.root);
+    std::swap(variables, other.variables);
+}
+
 
 Tree& Tree::operator=(Tree&& other) {
     if (this != &other) {
-        cout << "PP" << endl;
         delete root;
         variables.clear();
 
@@ -272,6 +287,14 @@ string Tree::intToString(int value) {
 
 Node* Tree::getRoot() const { return root; }
 map<string, int> Tree::getVariables() const { return variables; }
+
+int Tree::getCopyCount() {
+    return copyCount;
+}
+
+void Tree::resetCopyCount() {
+    copyCount = 0;
+}
 
 string Tree::getExtraTokensDescription(const vector<string>& tokens, int startIndex) {
     stringstream ss;
