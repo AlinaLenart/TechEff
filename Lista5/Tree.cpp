@@ -27,6 +27,13 @@ Tree::Tree(const Tree& other)
     ++copyCount;
 }
 
+Tree::Tree(Tree&& other) {
+    root = other.root;
+    variables = std::move(other.variables);
+    other.root = nullptr;
+}
+
+
 Result<Tree*, Error> Tree::buildTree(const vector<string>& tokens) {
     int index = 0;
 
@@ -164,7 +171,7 @@ Tree Tree::operator+(Tree& other) const {
     if (!this->root) return other;
     if (!other.root) return *this;
 
-    Tree result = *this;
+    Tree result = *this; //konstruktor kopiujacy
     Node* targetLeaf = findLeaf(result.root);
 
     if (targetLeaf != NULL) {
@@ -230,7 +237,7 @@ Tree& Tree::operator=(const Tree& other) {
     if (this == &other) {
         return *this;
     }
-    copyCount++;
+    // copyCount++;
     Tree temp(other);
     swap(temp);
     return *this;

@@ -13,6 +13,7 @@ class Tree {
 public:
     Tree();
     Tree(const Tree& other);
+    Tree(Tree&& other);
     ~Tree();
 
     Node* getRoot() const;
