@@ -24,6 +24,7 @@ public:
     Result<Tree*, Error > buildTree(const vector<string>& tokens);
     string getInOrder() const;
     Tree operator+(Tree &other) const;
+    Tree operator+(Tree &&other) const;
     Tree& operator=(const Tree& other);
     Tree& operator=(Tree&& other);
     static int getCopyCount();

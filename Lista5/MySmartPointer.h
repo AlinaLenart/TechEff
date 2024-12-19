@@ -1,5 +1,6 @@
 #ifndef MYSMARTPOINTER_H
 #define MYSMARTPOINTER_H
+#include <__stddef_null.h>
 
 template <typename T, typename E>
 class MySmartPointer {
@@ -13,19 +14,10 @@ public:
 private:
     T *pc_pointer;
     E *pc_counter;
+    void copyFrom(const MySmartPointer<T, E>& pcOther);
 };
 
-class CRefCounter {
-public:
-    CRefCounter() {
-        i_count = 0;
-    }
-    int iAdd() { return(++i_count); }
-    int iDec() { return(--i_count); }
-    int iGet() { return(i_count); }
-private:
-    int i_count;
-};
+
 
 template <typename T, typename E>
 MySmartPointer<T, E>::MySmartPointer(T *pcPointer) {
@@ -36,9 +28,7 @@ MySmartPointer<T, E>::MySmartPointer(T *pcPointer) {
 
 template <typename T, typename E>
 MySmartPointer<T, E>::MySmartPointer(const MySmartPointer<T, E>& pcOther) {
-    pc_pointer = pcOther.pc_pointer;
-    pc_counter = pcOther.pc_counter;
-    pc_counter->iAdd();
+    copyFrom(pcOther);
 }
 
 template <typename T, typename E>
@@ -61,18 +51,24 @@ T* MySmartPointer<T, E>::operator->() {
 
 template <typename T, typename E>
 MySmartPointer<T, E>& MySmartPointer<T, E>::operator=(const MySmartPointer<T, E>& pcOther) {
-    if (this != &pcOther) {
-        if (pc_counter->iDec() == 0) {
+    if (this != &pcOther && pc_pointer != pcOther.pc_pointer) {
+        if (pc_counter != NULL && pc_counter->iDec() == 0) {
             delete pc_pointer;
             delete pc_counter;
         }
-        pc_pointer = pcOther.pc_pointer;
-        pc_counter = pcOther.pc_counter;
-        pc_counter->iAdd();
+        copyFrom(pcOther);
     }
     return *this;
 }
 
+template <typename T, typename E>
+void MySmartPointer<T, E>::copyFrom(const MySmartPointer<T, E>& pcOther) {
+    pc_pointer = pcOther.pc_pointer;
+    pc_counter = pcOther.pc_counter;
+    if (pc_counter) {
+        pc_counter->iAdd();
+    }
+}
 
 
 

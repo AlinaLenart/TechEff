@@ -21,16 +21,74 @@ Tree::~Tree() { delete root; }
 Tree::Tree(const Tree& other)
     : root(NULL), variables(other.variables) {
     if (other.root) {
-        root = new Node(*other.root);  //kopia node roota
+        root = new Node(*other.root);//kopia node roota
         copyChildren(root, other.root);
     }
     ++copyCount;
 }
 
+Tree& Tree::operator=(const Tree& other) {
+    if (this == &other) {
+        return *this;
+    }
+    Tree temp(other);// copyCount++;
+    swap(temp);
+    return *this;
+}
+
+Tree Tree::operator+(Tree& other) const {
+    if (this->root == NULL) return other;
+    if (other.root == NULL) return *this;
+
+    Tree result = *this; //konstruktor kopiujacy
+    Node* targetLeaf = findLeaf(result.root);
+
+    if (targetLeaf != NULL) {
+        Node* parentNode = findParent(result.root, targetLeaf);
+        if (parentNode != NULL) {
+            Node* newSubtree = copySubtree(other.root); //kopia podrzewa
+            replaceChild(parentNode, targetLeaf, newSubtree);
+            delete targetLeaf;
+        }
+    }
+    return result;
+}
+
 Tree::Tree(Tree&& other) {
     root = other.root;
-    variables = std::move(other.variables);
-    other.root = nullptr;
+    variables = move(other.variables);
+    other.root = NULL;
+    other.variables.clear();
+}
+
+Tree& Tree::operator=(Tree&& other) {
+    if (this != &other) {
+        delete root;
+        variables.clear();
+
+        root = other.root;
+        other.root = NULL;
+    }
+    return *this;
+}
+
+Tree Tree::operator+(Tree&& other) const {
+    if (this->root == NULL) return std::move(other);
+    if (other.root == NULL) return *this;
+
+    Tree result = *this; //konstruktor przenoszacy
+    Node* targetLeaf = findLeaf(result.root);
+
+    if (targetLeaf != NULL) {
+        Node* parentNode = findParent(result.root, targetLeaf);
+        if (parentNode != NULL) {
+            Node* newSubtree = other.root; //bezposrednia kopia
+            other.root = NULL;
+            replaceChild(parentNode, targetLeaf, newSubtree);
+            delete targetLeaf;
+        }
+    }
+    return result;
 }
 
 
@@ -125,7 +183,7 @@ string Tree::printPrefixHelper(Node* node) const {
 
     string result = node->value + " ";
 
-    for (size_t i = 0; i < node->children.size(); ++i) {
+    for (int i = 0; i < node->children.size(); ++i) {
         result += printPrefixHelper(node->children[i]);
     }
 
@@ -167,30 +225,11 @@ string Tree::inorderTraversal(Node* node) const {
     return result;
 }
 
-Tree Tree::operator+(Tree& other) const {
-    if (!this->root) return other;
-    if (!other.root) return *this;
-
-    Tree result = *this; //konstruktor kopiujacy
-    Node* targetLeaf = findLeaf(result.root);
-
-    if (targetLeaf != NULL) {
-
-        Node* parentNode = findParent(result.root, targetLeaf);
-        if (parentNode != NULL) {
-
-            Node* newSubtree = copySubtree(other.root); //kopia podrzewa
-            replaceChild(parentNode, targetLeaf, newSubtree);
-            delete targetLeaf;
-        }
-    }
-    return result;
-}
 
 void Tree::replaceChild(Node* parentNode, Node* oldChild, Node* newChild) const {
     if (!parentNode || !oldChild || !newChild) return;
 
-    for (size_t i = 0; i < parentNode->children.size(); ++i) {
+    for (int i = 0; i < parentNode->children.size(); ++i) {
         if (parentNode->children[i] == oldChild) {
             parentNode->children[i] = newChild;
             return;
@@ -201,7 +240,7 @@ void Tree::replaceChild(Node* parentNode, Node* oldChild, Node* newChild) const 
 Node* Tree::findParent(Node* root, Node* child) const {
     if (root == NULL) return NULL;
 
-    for (size_t i = 0; i < root->children.size(); ++i) {
+    for (int i = 0; i < root->children.size(); ++i) {
         Node* node = root->children[i];
 
         if (node == child) {
@@ -209,7 +248,7 @@ Node* Tree::findParent(Node* root, Node* child) const {
         }
 
         Node* foundParent = findParent(node, child);
-        if (foundParent) return foundParent;
+        if (foundParent != NULL) return foundParent;
     }
 
     return NULL;
@@ -223,7 +262,7 @@ Node* Tree::findLeaf(Node* node) const {
         return node;
     }
 
-    for (size_t i = 0; i < node->children.size(); ++i) {
+    for (int i = 0; i < node->children.size(); ++i) {
         Node* leaf = findLeaf(node->children[i]); //szukam rekursja liscia w dzieciach
         if (leaf) {
             return leaf;
@@ -232,37 +271,6 @@ Node* Tree::findLeaf(Node* node) const {
 
     return NULL;
 }
-
-Tree& Tree::operator=(const Tree& other) {
-    if (this == &other) {
-        return *this;
-    }
-    // copyCount++;
-    Tree temp(other);
-    swap(temp);
-    return *this;
-}
-
-void Tree::swap(Tree& other) {
-    std::swap(root, other.root);
-    std::swap(variables, other.variables);
-}
-
-
-Tree& Tree::operator=(Tree&& other) {
-    if (this != &other) {
-        delete root;
-        variables.clear();
-
-        root = other.root;
-        other.root = nullptr;
-
-        variables = std::move(other.variables);
-        other.variables.clear();
-    }
-    return *this;
-}
-
 
 void Tree::copyChildren(Node* dest, Node* src) {
     if (!src || !dest) return;
@@ -279,7 +287,7 @@ Node* Tree::copySubtree(Node* node) const {
 
     Node* copy = new Node(*node);
 
-    for (size_t i = 0; i < node->children.size(); ++i) {
+    for (int i = 0; i < node->children.size(); ++i) {
         copy->addChild(copySubtree(node->children[i]));
     }
 
@@ -303,10 +311,15 @@ void Tree::resetCopyCount() {
     copyCount = 0;
 }
 
+void Tree::swap(Tree& other) {
+    std::swap(root, other.root);
+    std::swap(variables, other.variables);
+}
+
 string Tree::getExtraTokensDescription(const vector<string>& tokens, int startIndex) {
     stringstream ss;
     ss << "[";
-    for (size_t i = startIndex; i < tokens.size(); ++i) {
+    for (int i = startIndex; i < tokens.size(); ++i) {
         ss << tokens[i];
         if (i < tokens.size() - 1) {
             ss << ", ";

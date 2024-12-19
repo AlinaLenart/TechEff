@@ -21,6 +21,7 @@ public:
     Node(NodeType t, const string& val, int numChildren);
     Node(NodeType t, const string& val);
     Node(const Node& other);
+    Node(Node&& other);
     explicit Node(int val);
     ~Node();
     void addChild(Node* child);

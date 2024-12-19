@@ -23,6 +23,12 @@ Node::Node(const Node& other)
     //dzieci kopiuje w drzewie
 }
 
+//konstruktor przenoszacy
+Node::Node(Node&& other)
+    : type(other.type), value(std::move(other.value)), children(std::move(other.children)) {
+    other.children.clear();
+}
+
 
 void Node::addChild(Node* child) {
     children.push_back(child);
