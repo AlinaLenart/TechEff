@@ -1,0 +1,3 @@
+/Users/al/Code/Uni/TechEff/miniProject/cmake-build-debug/CMakeFiles/mini_project2.dir
+/Users/al/Code/Uni/TechEff/miniProject/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/al/Code/Uni/TechEff/miniProject/cmake-build-debug/CMakeFiles/rebuild_cache.dir

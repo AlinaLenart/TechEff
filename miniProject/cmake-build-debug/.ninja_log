@@ -1,0 +1,14 @@
+# ninja log v6
+3	69	1736098971864690579	build.ninja	befdf76a31a73c03
+5	649	1736098129000904208	CMakeFiles/mini_project2.dir/GroupingChallenge.cpp.o	fc9ba3efedda63d
+5	604	1736098129001148647	CMakeFiles/mini_project2.dir/GroupingEvaluator.cpp.o	d7ed962a2a0c398a
+683	810	1736098129679339681	mini_project2	f967a02fbe6885be
+3	425	1736082577080959737	CMakeFiles/mini_project2.dir/Point.cpp.o	1af192fc614b297a
+5	669	1736098129001401711	CMakeFiles/mini_project2.dir/Optimizer.cpp.o	62506193743fb29b
+4	683	1736098129000602773	CMakeFiles/mini_project2.dir/GaussianGroupingEvaluatorFactory.cpp.o	74abf452336fae89
+6	461	1736098989472719100	CMakeFiles/mini_project2.dir/Point.cpp.o	4c2bb0ed42fe9de0
+5	465	1736098989472385560	CMakeFiles/mini_project2.dir/GroupingEvaluator.cpp.o	4a6cb550a2fb3842
+5	510	1736098989472244353	CMakeFiles/mini_project2.dir/GroupingChallenge.cpp.o	7cfc1f84d4d4ecd
+5	537	1736098989472506518	CMakeFiles/mini_project2.dir/Optimizer.cpp.o	226d4aa1c5f132c0
+5	546	1736098989471981646	CMakeFiles/mini_project2.dir/GaussianGroupingEvaluatorFactory.cpp.o	63fcd9cf07bb11f1
+546	583	1736098990013215785	mini_project2	f967a02fbe6885be
